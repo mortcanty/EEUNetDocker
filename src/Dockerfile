@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     gdal-bin \
     libgdal-dev \
-    python3-pip  
+    python3-pip   
 
 # jupyter notebook with leaflet
 RUN     pip3 install --upgrade pip
@@ -67,7 +67,7 @@ RUN     pip3 install tensorflow
 RUN     pip3 install --upgrade tensorflow-probability==0.11.1
 RUN     pip3 install geopy
 
-ENV     REFRESHED_AT 2022-01-01
+ENV     REFRESHED 03.01.2022
 
 COPY    interface.ipynb /home/interface.ipynb
 COPY    unet_inria_model4.h5 /home/unet_inria_model4.h5

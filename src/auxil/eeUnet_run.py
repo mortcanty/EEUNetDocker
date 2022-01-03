@@ -43,15 +43,15 @@ def GetTileLayerUrl(ee_image_object):
     return map_id["tile_fetcher"].url_format
 
 w_collection = widgets.RadioButtons(
-    options=['USDA/NAIP/DOQQ','SKYSAT/GEN-A/PUBLIC/ORTHO/RGB'],
+    options=['USDA/NAIP/DOQQ','SKYSAT/GEN-A/PUBLIC/ORTHO/MULTISPECTRAL'],
     value='USDA/NAIP/DOQQ',
-    layout=widgets.Layout(width='50%', height='80px'),
+    layout=widgets.Layout(width='90%', height='80px'),
     description='Collection:',
     disabled=False
 )
 
 w_startdate = widgets.Text(
-    value='2018-01-01',
+    value='2014-01-01',
     placeholder=' ',
     description='Start date:',
     disabled=False
@@ -69,7 +69,7 @@ w_text = widgets.Textarea(
     disabled = False
 )
 w_location = widgets.Text(
-    value='Springfield, Missouri',
+    value='Philadelphia',
     placeholder=' ',
     description='',
     disabled=False
@@ -93,10 +93,10 @@ w_export = widgets.Button(description='Export to Drive',disabled=True)
 w_scalesig = widgets.HBox([w_scale])
 w_exp = widgets.HBox([w_export,w_exportname])
 w_top = widgets.HBox([w_text,w_goto,w_location])
-w_mid = widgets.HBox([w_collection,w_startdate,w_enddate])
+w_mid = widgets.HBox([w_startdate,w_enddate])
 w_bot = widgets.HBox([w_collect,w_exp,w_scale])
 
-box = widgets.VBox([w_top,w_mid,w_bot])
+box = widgets.VBox([w_top,w_collection,w_mid,w_bot])
 
 def on_widget_change(b):
     pass
@@ -125,20 +125,13 @@ def on_collect_button_clicked(b):
     global hr
     try:
         w_text.value = 'Collecting ...'   
-        if w_collection.value == 'USDA/NAIP/DOQQ':
-            hr = ee.ImageCollection(w_collection.value) \
-                          .filterDate(ee.Date(w_startdate.value), ee.Date(w_enddate.value)) \
-                          .select(['R','G','B','N']) \
-                          .filterBounds(poly) \
-                          .mosaic() \
-                          .clip(poly) 
-        else:
-            hr = ee.ImageCollection(w_collection.value) \
-                          .select(['R','G','B','N']) \
-                          .filterBounds(poly) \
-                          .first() \
-                          .clip(poly)
-        layer = TileLayer(url=GetTileLayerUrl(rgbLayer(hr.select('R','G','B'))))
+        hr = ee.ImageCollection(w_collection.value) \
+                      .filterDate(ee.Date(w_startdate.value), ee.Date(w_enddate.value)) \
+                      .filterBounds(poly) \
+                      .select(['R','G','B','N']) \
+                      .mosaic() \
+                      .clip(poly)                                                                                        
+        layer = TileLayer(url=GetTileLayerUrl(rgbLayer(hr.select(['R','G','B']))))
         if len(m.layers)>2:
             m.remove_layer(m.layers[2])              
         m.add_layer(layer)            
