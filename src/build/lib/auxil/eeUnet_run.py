@@ -147,6 +147,7 @@ def on_export_drv_button_clicked(b):
         gdexport = ee.batch.Export.image.toDrive(hr,
                                     description='driveExportTask', 
                                     folder = 'gee',
+                                    crs = 'EPSG:26916',
                                     fileNamePrefix=fileNamePrefix,scale=w_scale.value,maxPixels=1e11)   
         gdexport.start()
         w_text.value = 'Exporting aoi to Drive/gee/%s\n task id: %s'%(fileNamePrefix,str(gdexport.id)) 

@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 #******************************************************************************
 #  Name:     unetcnnclass.py
-#  Purpose:  Use FCN to find buildings in a hi-res rgbn image
+#  Purpose:  Use CNN to find buildings in a hi-res rgb image
 #  Usage (from command line):             
 #    python unetcnnclass.py  [options] filename
 #
 #  Copyright (c) 2021 Mort Canty
 
-import sys, os, time, getopt
+import sys, os, time, getopt, cv2
+import tensorflow as tf
 import tensorflow.keras as keras
 import numpy as np
 from osgeo import gdal
+from tqdm import tqdm
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 
 def bytestretch(arr,rng=None):
@@ -92,19 +94,19 @@ Assumes rgb image bands only
     gdal.AllRegister()
     
     try:   
-# #      blob detector
-#         params = cv2.SimpleBlobDetector_Params() 
-#         params.minThreshold = 100
-#         params.maxThreshold = 256
-#         params.filterByCircularity = False
-#         params.filterByInertia = False
-#         params.filterByConvexity = False
-#         params.filterByColor=False
-#         params.filterByArea = True
-#         params.minArea = 20
-#         params.maxArea = 1e5
-#         detector = cv2.SimpleBlobDetector_create(params) 
-#         detector.empty()
+#      blob detector
+        params = cv2.SimpleBlobDetector_Params() 
+        params.minThreshold = 100
+        params.maxThreshold = 256
+        params.filterByCircularity = False
+        params.filterByInertia = False
+        params.filterByConvexity = False
+        params.filterByColor=False
+        params.filterByArea = True
+        params.minArea = 20
+        params.maxArea = 1e5
+        detector = cv2.SimpleBlobDetector_create(params) 
+        detector.empty()
 #      load the trained CNN model     
         model = keras.models.load_model(model_path)   
 #      read in rgb image           
@@ -138,8 +140,8 @@ Assumes rgb image bands only
                 result[iy*512:(iy+1)*512,ix*512:(ix+1)*512] = res
         result = np.where(result<threshold,0,255) 
         im = result.astype(np.uint8)
-#        keypoints = detector.detect(im)
-#        print('Number of structures: %i'%len(keypoints))
+        keypoints = detector.detect(im)
+        print('Number of structures: %i'%len(keypoints))
     except Exception as e:
         print('Error: %s'%e)             
 #  write to disk    
